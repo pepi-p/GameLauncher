@@ -1,0 +1,32 @@
+﻿<UserControl x:Class="Launcher.Views.Detail"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Launcher"
+             xmlns:prism="http://prismlibrary.com/"
+             prism:ViewModelLocator.AutoWireViewModel="True"
+             mc:Ignorable="d"
+             d:DesignHeight="960" d:DesignWidth="1167">
+    <Grid>
+        <Rectangle x:Name="BackGround" Fill="#FFFFFFFF" Height="960" Width="1167" RadiusX="8" RadiusY="8"/>
+        <Image x:Name="TitleImage" Source="{Binding TitleImage.Value}" Height="506" Width="900" Margin="0,0,161,328" />
+        <Rectangle x:Name="DescriptionBackGround" Fill="#FFF4F4F4" Height="158" Width="1040" RadiusX="10" RadiusY="10" Margin="0,698,1,0" />
+        <Image x:Name="PlayButtonImage" Source="/Resources/Images/Play.png" Height="133" Width="267" Margin="0,349,774,0" />
+        <Button x:Name="PlayButton" Command="{Binding PlayCommand}" Height="133" Width="267" Margin="0,349,774,0" Opacity="0" MouseEnter="PlayButtonEnter" MouseLeave="PlayButtonLeave"/>
+        <Image x:Name="ExitButtonImage" Source="/Resources/Images/Exit.png" Height="83" Width="83" Margin="960,0,0,771" />
+        <Button x:Name="ExitButton" Command="{Binding ExitCommand}" Height="83" Width="83" Margin="960,0,0,771" Opacity="0" MouseEnter="ExitButtonEnter" MouseLeave="ExitButtonLeave"/>
+        <TextBlock x:Name="TitleText" FontSize="56" Text="{Binding TitleText.Value}" Margin="369,588,214,294" />
+        <TextBlock x:Name="DescriptionText" FontSize="30" Text="{Binding DescriptionText.Value}" Margin="93,780,324,82" Width="750" TextWrapping="Wrap" TextTrimming="CharacterEllipsis" />
+        <TextBlock x:Name="VersionText" FontSize="30" Text="{Binding VersionText.Value}" Margin="780,628,87,294" Width="300" TextAlignment="Right" />
+        <TextBlock x:Name="AuthorText" FontSize="25" Text="{Binding AuthorText.Value}" Margin="780,820,87,105" Width="300" TextAlignment="Right" />
+        <TextBlock x:Name="LastUpdateText" FontSize="25" Text="{Binding LastUpdateText.Value}" Margin="780,855,87,52" Width="300" TextAlignment="Right" />
+        <ItemsControl Height="54" Width="760" Margin="321,450,0,0" prism:RegionManager.RegionName="TagRegion">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <WrapPanel Orientation="Horizontal"/>
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+        </ItemsControl>
+    </Grid>
+</UserControl>

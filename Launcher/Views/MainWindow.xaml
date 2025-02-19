@@ -1,0 +1,68 @@
+﻿<Window x:Class="Launcher.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:prism="http://prismlibrary.com/"
+        xmlns:local="clr-namespace:Launcher.Views"
+        prism:ViewModelLocator.AutoWireViewModel="True"
+        WindowStyle="None"
+        WindowState="Maximized"
+        Height="1080" Width="1920" >
+    <Window.Resources>
+        <Storyboard x:Key="ShowDetailAnimation">
+            <DoubleAnimation Storyboard.TargetName="DetailContent"
+                             Storyboard.TargetProperty="(Canvas.Top)"
+                             From="120" To="0" Duration="0:0:0.2">
+                <DoubleAnimation.EasingFunction>
+                    <SineEase EasingMode="EaseOut"/>
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+            <ColorAnimation Storyboard.TargetName="BackGround"
+                 Storyboard.TargetProperty="(Shape.Fill).(SolidColorBrush.Color)"
+                 From="#00000000" To="#C0000000" Duration="0:0:0.2">
+                <ColorAnimation.EasingFunction>
+                    <SineEase EasingMode="EaseOut"/>
+                </ColorAnimation.EasingFunction>
+            </ColorAnimation>
+        </Storyboard>
+        <Storyboard x:Key="HideDetailAnimation">
+            <DoubleAnimation Storyboard.TargetName="DetailContent"
+                             Storyboard.TargetProperty="(Canvas.Top)"
+                             From="0" To="120" Duration="0:0:0.2">
+                <DoubleAnimation.EasingFunction>
+                    <SineEase EasingMode="EaseIn"/>
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+            <ColorAnimation Storyboard.TargetName="BackGround"
+                            Storyboard.TargetProperty="(Shape.Fill).(SolidColorBrush.Color)"
+                            From="#C0000000" To="#00000000" Duration="0:0:0.2">
+                <ColorAnimation.EasingFunction>
+                    <SineEase EasingMode="EaseIn"/>
+                </ColorAnimation.EasingFunction>
+            </ColorAnimation>
+        </Storyboard>
+    </Window.Resources>
+    <Grid>
+        <ContentControl prism:RegionManager.RegionName="ContentRegion" />
+        <Image x:Name="UpdateButtonImage" Source="/Resources/Images/Update.png" Height="100" Width="100" Margin="1680,880,0,0" />
+        <Rectangle x:Name="LogBG" Height="40" Width="1920" Margin="0,1040,0,0" Fill="#F0F0F0"/>
+        <TextBlock x:Name="LogText" Text="{Binding LogText.Value}" FontSize="24" Height="40" Width="1820" Margin="0,1040,0,0" />
+        <ScrollViewer VerticalScrollBarVisibility="Visible" x:Name="scrollViewer">
+            <Canvas Width="1440" Height="{Binding Height.Value}" Margin="0,50,0,0" x:Name="mainCanvas" >
+                <ItemsControl prism:RegionManager.RegionName="CardRegion">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <UniformGrid Columns="3" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                </ItemsControl>
+                <Rectangle x:Name="BackGround" Height="1080" Width="1920" Canvas.Left="-240" Canvas.Top="-50" IsHitTestVisible="False">
+                    <Rectangle.Fill>
+                        <SolidColorBrush Color="#00000000"/>
+                    </Rectangle.Fill>
+                </Rectangle>
+                <ContentControl x:Name="DetailContent" Margin="136.5,0,0,0" Width="1167" Height="960" prism:RegionManager.RegionName="DetailRegion" />
+            </Canvas>
+        </ScrollViewer>
+        <Button x:Name="UpdateButton" Command="{Binding UpdateCommand}" Height="100" Width="100" Margin="1680,880,0,0" Opacity="0" IsTabStop="False" MouseEnter="UpdateButtonEnter" MouseLeave="UpdateButtonLeave"/>
+    </Grid>
+</Window>
