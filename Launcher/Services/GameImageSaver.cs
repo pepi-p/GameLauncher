@@ -1,13 +1,15 @@
-﻿using Launcher.Interfaces;
+﻿using Launcher.Constants;
+using Launcher.Interfaces;
+using Launcher.Models;
+using Launcher.Models.Dtos;
 using Launcher.Utilities;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.IO;
+using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
-using Launcher.Models;
-using Launcher.Constants;
 
 namespace Launcher.Services
 {
@@ -17,30 +19,45 @@ namespace Launcher.Services
         private readonly IFileStreamSaver _fileStreamSaver;
         private readonly IDataRepository _dataRepository;
         private readonly IGameMetadataSaver _metadataSaver;
+        private readonly ILogger _logger;
 
-        public GameImageSaver(IApiClient api, IFileStreamSaver fileStreamSaver, IDataRepository dataRepository, IGameMetadataSaver metadataSaver, IWebSocketHandler webSocketHandler)
+        public GameImageSaver(IApiClient api, IFileStreamSaver fileStreamSaver, IDataRepository dataRepository, IGameMetadataSaver metadataSaver, IWebSocketHandler webSocketHandler, ILogger logger)
         {
             _api = api;
             _fileStreamSaver = fileStreamSaver;
             _dataRepository = dataRepository;
             _metadataSaver = metadataSaver;
+            _logger = logger;
 
-            webSocketHandler.RegistrarAction("Image", (id) => Save(id));
+            webSocketHandler.OnMessageReceived += async (object sender, MessageEventArgs e) => await Save(e);
         }
 
-        public async Task<Result> Save(int id)
+        public async Task<Result> Save(MessageEventArgs e)
         {
-            System.Diagnostics.Debug.WriteLine($"ImageSave: {id}");
+            _logger.Log(LogLevel.Info, $"[WS] 画像更新中 ({e.Type})");
 
-            var dataResult = await _metadataSaver.Save(id);
+            if (e.Type == "ImgUpdateData")
+            {
+                var data = JsonSerializer.Deserialize<ImgUpdateData>(e.Message);
 
-            var data = dataResult.Value;
-            var imgResult = await Save(data);
-            if (!imgResult.IsSuccess) return Result.Failure(imgResult.ErrorMessage);
+                var dataResult = await _metadataSaver.SaveToRepository(data.Id);
 
-            _dataRepository.Registrar(id, data);
+                var meatadata = dataResult.Value;
+                var imgResult = await Save(meatadata);
+                if (!imgResult.IsSuccess)
+                {
+                    _logger.Log(LogLevel.Info, $"[WS] 画像更新失敗 ({imgResult.ErrorMessage})");
+                    return Result.Failure(imgResult.ErrorMessage);
+                }
 
-            return Result.Success();
+                _dataRepository.Registrar(data.Id, meatadata);
+
+                _logger.Log(LogLevel.Info, $"[WS] 画像更新成功 ({e.Type})");
+                return Result.Success();
+            }
+
+            _logger.Log(LogLevel.Info, $"[WS] 画像更新失敗 ({e.Type})");
+            return Result.Failure("画像更新失敗. GameImageSaver.Save()");
         }
 
         public async Task<Result> Save(GameMetadata data)

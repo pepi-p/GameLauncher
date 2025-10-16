@@ -8,6 +8,6 @@ namespace Launcher.Interfaces
 {
     public interface IWebSocketHandler
     {
-        public void RegistrarAction(string key, Action<int> method);
+        public event EventHandler<MessageEventArgs> OnMessageReceived;
     }
 }

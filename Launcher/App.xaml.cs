@@ -7,6 +7,7 @@ using Prism.Ioc;
 using Prism.Unity;
 using System;
 using System.Diagnostics;
+using System.IO;
 using System.Windows;
 
 namespace Launcher
@@ -23,6 +24,12 @@ namespace Launcher
 
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
         {
+            // フォルダ作成
+            if (!Directory.Exists(FilePaths.RootPath)) Directory.CreateDirectory(FilePaths.RootPath);
+            if (!Directory.Exists(FilePaths.ZipPath)) Directory.CreateDirectory(FilePaths.ZipPath);
+            if (!Directory.Exists(FilePaths.GamePath)) Directory.CreateDirectory(FilePaths.GamePath);
+            if (!Directory.Exists(FilePaths.LogPath)) Directory.CreateDirectory(FilePaths.LogPath);
+
             containerRegistry.RegisterForNavigation<Card>();
             containerRegistry.RegisterForNavigation<Detail>();
             containerRegistry.RegisterForNavigation<Tag>();

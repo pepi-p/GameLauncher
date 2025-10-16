@@ -1,5 +1,6 @@
 ﻿using Launcher.Interfaces;
 using Launcher.Models;
+using Launcher.Models.Dtos;
 using Launcher.Utilities;
 using System;
 using System.Collections.Generic;
@@ -23,32 +24,11 @@ namespace Launcher.Services
             _client = new HttpClient();
         }
 
-        public async Task<Result> HealthCheck()
-        {
-            try
-            {
-                var response = await _client.GetAsync(_serverAddress + "/api/health");
-                response.EnsureSuccessStatusCode();
-
-                string body = await response.Content.ReadAsStringAsync();
-
-                return Result.Success();
-            }
-            catch (HttpRequestException e)
-            {
-                return Result.Failure($"Health check failed : {e.Message}");
-            }
-            catch (TaskCanceledException e)
-            {
-                return Result.Failure($"Health check timed out: {e.Message}");
-            }
-        }
-
         public async Task<Result<GameMetadata>> GetGameMetadata(int id)
         {
             try
             {
-                var response = await _client.GetAsync(_serverAddress + $"/api/search?id={id}");
+                var response = await _client.GetAsync(_serverAddress + $"/api/metadata/get?id={id}");
                 response.EnsureSuccessStatusCode();
 
                 var body = await response.Content.ReadAsStringAsync();
@@ -59,16 +39,19 @@ namespace Launcher.Services
                     PropertyNamingPolicy = JsonNamingPolicy.CamelCase
                 };
 
-                var data = JsonSerializer.Deserialize<GameMetadata>(body, options);
+                var data = JsonSerializer.Deserialize<ReadData>(body, options);
+                var metadata = DotsConverter.ReadDataToMetadata(data);
 
-                return Result<GameMetadata>.Success(data);
+                return Result<GameMetadata>.Success(metadata);
             }
             catch (HttpRequestException e)
             {
+                _logger.Log(LogLevel.Error, $"ApiClientService.GetGameMetadata(): {e.Message}");
                 return Result<GameMetadata>.Failure($"ApiClientService.GetGameMetadata(): {e.Message}");
             }
             catch (InvalidOperationException e)
             {
+                _logger.Log(LogLevel.Error, $"ApiClientService.GetGameMetadata(): {e.Message}");
                 return Result<GameMetadata>.Failure($"ApiClientService.GetGameMetadata(): {e.Message}");
             }
         }
@@ -77,7 +60,7 @@ namespace Launcher.Services
         {
             try
             {
-                var response = await _client.GetAsync(_serverAddress + "/api/search");
+                var response = await _client.GetAsync(_serverAddress + "/api/metadata/getall");
                 response.EnsureSuccessStatusCode();
 
                 var body = await response.Content.ReadAsStringAsync();
@@ -88,16 +71,25 @@ namespace Launcher.Services
                     PropertyNamingPolicy = JsonNamingPolicy.CamelCase
                 };
 
-                var datas = JsonSerializer.Deserialize<List<GameMetadata>>(body, options);
+                var datas = JsonSerializer.Deserialize<List<ReadData>>(body, options);
 
-                return Result<List<GameMetadata>>.Success(datas);
+                List<GameMetadata> metadatas = new();
+
+                foreach (var data in datas)
+                {
+                    metadatas.Add(DotsConverter.ReadDataToMetadata(data));
+                }
+
+                return Result<List<GameMetadata>>.Success(metadatas);
             }
             catch (HttpRequestException e)
             {
+                _logger.Log(LogLevel.Error, $"ApiClientService.GetGameMetadataAll(): {e.Message}");
                 return Result<List<GameMetadata>>.Failure($"ApiClientService.GetGameMetadataAll(): {e.Message}");
             }
             catch (InvalidOperationException e)
             {
+                _logger.Log(LogLevel.Error, $"ApiClientService.GetGameMetadataAll(): {e.Message}");
                 return Result<List<GameMetadata>>.Failure($"ApiClientService.GetGameMetadataAll(): {e.Message}");
             }
         }
@@ -106,12 +98,14 @@ namespace Launcher.Services
         {
             try
             {
-                var response = await _client.GetAsync(_serverAddress + "/api/download/game/" + id, HttpCompletionOption.ResponseHeadersRead);
+                // var response = await _client.GetAsync(_serverAddress + "/api/download/game/" + id, HttpCompletionOption.ResponseHeadersRead);
+                var response = await _client.GetAsync(_serverAddress + $"/api/metadata/download/game?id={id}");
                 var stream = await response.Content.ReadAsStreamAsync();
                 return Result<Stream>.Success(stream);
             }
             catch (HttpRequestException e)
             {
+                _logger.Log(LogLevel.Error, $"ApiClientService.GetGameZip(): {e.Message}");
                 return Result<Stream>.Failure($"ApiClientService.GetGameZip(): {e.Message}");
             }
         }
@@ -120,12 +114,13 @@ namespace Launcher.Services
         {
             try
             {
-                var response = await _client.GetAsync(_serverAddress + "/api/download/image/" + id, HttpCompletionOption.ResponseHeadersRead);
+                var response = await _client.GetAsync(_serverAddress + $"/api/metadata/download/image?id={id}");
                 var stream = await response.Content.ReadAsStreamAsync();
                 return Result<Stream>.Success(stream);
             }
             catch (HttpRequestException e)
             {
+                _logger.Log(LogLevel.Error, $"ApiClientService.GetGameImage(): {e.Message}");
                 return Result<Stream>.Failure($"ApiClientService.GetGameImage(): {e.Message}");
             }
         }

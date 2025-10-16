@@ -9,15 +9,6 @@ namespace Launcher.Interfaces
     public interface IApiClient
     {
         /// <summary>
-        /// サーバのヘルスチェックを実行する
-        /// サーバが稼働しているかどうかを確認するために使用する
-        /// </summary>
-        /// <returns>
-        /// 成功した場合は true，失敗した場合は false を返す
-        /// </returns>
-        public Task<Result> HealthCheck();
-
-        /// <summary>
         /// サーバからゲームのMetadataを取得する
         /// 指定したゲームのMetadataを取得するために使用する
         /// </summary>

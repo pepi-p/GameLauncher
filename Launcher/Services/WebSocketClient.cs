@@ -8,7 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Text.Json;
 using Launcher.Interfaces;
-using Launcher.Models;
+using Launcher.Models.Dtos;
 
 namespace Launcher.Services
 {
@@ -16,18 +16,14 @@ namespace Launcher.Services
     {
         private readonly ClientWebSocket _webSocket = new();
         private readonly Uri _uri;
-        private Dictionary<string, Action<int>> _actDict = new();
+
+        public event EventHandler<MessageEventArgs> OnMessageReceived;
 
         public WebSocketClient(IServerAddressProvider serverAddress)
         {
             _uri = new Uri(serverAddress.GetWebSocketAddress());
         }
-
-        public void RegistrarAction(string key, Action<int> method)
-        {
-            _actDict.Add(key, method);
-        }
-
+        
         public async Task ConnectAsync()
         {
             System.Diagnostics.Debug.WriteLine(_uri);
@@ -61,13 +57,12 @@ namespace Launcher.Services
 
                 string message = Encoding.UTF8.GetString(buffer, 0, result.Count);
 
-                var options = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
-                var jsonData = JsonSerializer.Deserialize<UpdateData>(message, options);                
+                var jsonBase = JsonSerializer.Deserialize<JsonBase>(message);
 
-                if (_actDict.ContainsKey(jsonData.Command))
+                if (jsonBase is not null)
                 {
-                    _actDict[jsonData.Command].Invoke(jsonData.Id);
-                    System.Diagnostics.Debug.WriteLine($"{jsonData.Command}: {jsonData.Id}");
+                    System.Diagnostics.Debug.WriteLine($"Type: {jsonBase.Type}");
+                    OnMessageReceived.Invoke(this, new MessageEventArgs(jsonBase.Type, message));
                 }
 
                 System.Diagnostics.Debug.WriteLine($"Received: {message}");

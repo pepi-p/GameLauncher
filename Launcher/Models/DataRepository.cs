@@ -42,6 +42,11 @@ namespace Launcher.Models
             OnDataChanged?.Invoke(_datas);
         }
 
+        public void Registrar(GameMetadata data)
+        {
+            Registrar(data.Id, data);
+        }
+
         public void Unregistrar(int id)
         {
             if (!_datas.ContainsKey(id)) return;

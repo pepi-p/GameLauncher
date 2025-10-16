@@ -1,7 +1,6 @@
 ﻿using Launcher.Interfaces;
 using System;
 using System.IO;
-using System.Security.Policy;
 
 namespace Launcher.Services
 {
@@ -19,7 +18,7 @@ namespace Launcher.Services
         private string ReadServerAddress(string filePath)
         {
             // ファイルが見つからない場合，ファイルを新規作成しlocalhostで初期化する
-            if (!File.Exists(filePath)) File.WriteAllText(filePath, "http://127.0.0.1:8000/");
+            if (!File.Exists(filePath)) File.WriteAllText(filePath, "http://127.0.0.1:8080/");
 
             return File.ReadAllText(filePath).Trim();
         }

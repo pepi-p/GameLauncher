@@ -1,13 +1,15 @@
-﻿using Launcher.Interfaces;
+﻿using Launcher.Constants;
+using Launcher.Interfaces;
 using Launcher.Models;
+using Launcher.Models.Dtos;
 using Launcher.Utilities;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.IO;
+using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
-using Launcher.Constants;
 
 namespace Launcher.Services
 {
@@ -27,18 +29,28 @@ namespace Launcher.Services
             _dataRepository = dataRepository;
             _metadataSaver = metadataSaver;
 
-            webSocketHandler.RegistrarAction("File", (id) => Save(id));
+            webSocketHandler.OnMessageReceived += async (object sender, MessageEventArgs e) => await Save(e);
         }
 
-        public async Task<Result> Save(int id)
+        public async Task<Result> Save(MessageEventArgs e)
         {
-            var data = _dataRepository.GetData(id);
-            var fileResult = await Save(data);
-            if (!fileResult.IsSuccess) return Result.Failure(fileResult.ErrorMessage);
+            if (e.Type == "ExeUpdateData")
+            {
+                var data = JsonSerializer.Deserialize<ExeUpdateData>(e.Message);
 
-            _metadataSaver.SaveToRepository(id);
+                if (data is not null)
+                {
+                    var metadata = _dataRepository.GetData(data.Id);
+                    var fileResult = await Save(metadata);
+                    if (!fileResult.IsSuccess) return Result.Failure(fileResult.ErrorMessage);
 
-            return Result.Success();
+                    await _metadataSaver.SaveToRepository(data.Id);
+
+                    return Result.Success();
+                }
+            }
+
+            return Result.Failure("exe更新失敗. GameFileSaver.Save()");
         }
 
         public async Task<Result> Save(GameMetadata data)

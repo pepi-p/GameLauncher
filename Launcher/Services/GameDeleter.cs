@@ -1,10 +1,14 @@
-﻿using Launcher.Interfaces;
-using Launcher.Constants;
+﻿using Launcher.Constants;
+using Launcher.Interfaces;
+using Launcher.Models.Dtos;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
-using System.IO;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace Launcher.Services
@@ -17,17 +21,25 @@ namespace Launcher.Services
         {
             _dataRepository = dataRepository;
 
-            webSocketHandler.RegistrarAction("Delete", Delete);
+            webSocketHandler.OnMessageReceived += Delete;
         }
 
-        public async void Delete(int id)
+        public void Delete(object sender, MessageEventArgs e)
         {
-            var data = _dataRepository.GetData(id);
-            var path = Path.Join(FilePaths.GamePath, data.DirName);
+            if (e.Type == "DeleteData")
+            {
+                var data = JsonSerializer.Deserialize<DeleteData>(e.Message);
 
-            Directory.Delete(path, true);
+                if (data is not null)
+                {
+                    var metadata = _dataRepository.GetData(data.Id);
+                    var path = Path.Join(FilePaths.GamePath, metadata.DirName);
 
-            _dataRepository.Unregistrar(id);
+                    Directory.Delete(path, true);
+
+                    _dataRepository.Unregistrar(data.Id); 
+                }
+            }
         }
     }
 }

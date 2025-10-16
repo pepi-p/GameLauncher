@@ -2,6 +2,7 @@
 {
     public static class FilePaths
     {
+        public const string RootPath = @".\Resources";
         public const string ZipPath = @".\Resources\Zips";
         public const string GamePath = @".\Resources\Games";
         public const string AddressTextPath = @".\Resources\ServerAddress.txt";

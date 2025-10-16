@@ -10,7 +10,7 @@ namespace Launcher.Interfaces
 {
     public interface IGameSaver
     {
-        public Task<Result> Save(int id);
+        public Task Save(MessageEventArgs e);
         public Task<Result> Save(GameMetadata data);
     }
 }
