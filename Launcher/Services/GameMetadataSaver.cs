@@ -30,9 +30,10 @@ namespace Launcher.Services
 
         public Result<GameMetadata> Save(MessageEventArgs e)
         {
-            _logger.Log(LogLevel.Info, $"[WS] メタデータ更新中 ({e.Type})");
             if (e.Type == "UpdateData")
             {
+                _logger.Log(LogLevel.Info, $"[WS] メタデータ更新中 ({e.Type})");
+
                 var data = JsonSerializer.Deserialize<UpdateData>(e.Message);
 
                 var metadata = Utilities.DotsConverter.UpdateDataToMetadata(data);
@@ -47,7 +48,7 @@ namespace Launcher.Services
                 _logger.Log(LogLevel.Info, "[WS] メタデータ更新成功");
                 return Result<GameMetadata>.Success(metadata);
             }
-            _logger.Log(LogLevel.Error, $"[WS] メタデータ更新失敗{e.Message}");
+
             return Result<GameMetadata>.Failure("メタデータ保存失敗. GameMetadataSaver.Save()");
         }
 

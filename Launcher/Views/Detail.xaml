@@ -16,7 +16,15 @@
         <Button x:Name="PlayButton" Command="{Binding PlayCommand}" Height="133" Width="267" Margin="0,349,774,0" Opacity="0" MouseEnter="PlayButtonEnter" MouseLeave="PlayButtonLeave"/>
         <Image x:Name="ExitButtonImage" Source="/Resources/Images/Exit.png" Height="83" Width="83" Margin="960,0,0,771" />
         <Button x:Name="ExitButton" Command="{Binding ExitCommand}" Height="83" Width="83" Margin="960,0,0,771" Opacity="0" MouseEnter="ExitButtonEnter" MouseLeave="ExitButtonLeave"/>
-        <TextBlock x:Name="TitleText" FontSize="56" Text="{Binding TitleText.Value}" Margin="369,588,214,294" />
+        <Viewbox Stretch="Uniform"
+         Margin="369,588,214,294">
+            <TextBlock x:Name="TitleText"
+               Text="{Binding TitleText.Value}"
+               FontSize="56"
+               TextWrapping="NoWrap"
+               TextAlignment="Center"
+               TextTrimming="CharacterEllipsis"/>
+        </Viewbox>
         <TextBlock x:Name="DescriptionText" FontSize="30" Text="{Binding DescriptionText.Value}" Margin="93,780,324,82" Width="750" TextWrapping="Wrap" TextTrimming="CharacterEllipsis" />
         <TextBlock x:Name="VersionText" FontSize="30" Text="{Binding VersionText.Value}" Margin="780,628,87,294" Width="300" TextAlignment="Right" />
         <TextBlock x:Name="AuthorText" FontSize="25" Text="{Binding AuthorText.Value}" Margin="780,820,87,105" Width="300" TextAlignment="Right" />

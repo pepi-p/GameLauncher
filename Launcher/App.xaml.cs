@@ -56,7 +56,7 @@ namespace Launcher
             containerRegistry.RegisterSingleton<IGameImageSaver, GameImageSaver>();
             containerRegistry.RegisterSingleton<IGameSaver, GameSaver>();
 
-            var gameDeleter = new GameDeleter(dataRepository, webSocketClient);
+            var gameDeleter = new GameDeleter(dataRepository, webSocketClient, logger);
             containerRegistry.RegisterInstance(gameDeleter);
 
             _ = webSocketClient.ConnectAsync();

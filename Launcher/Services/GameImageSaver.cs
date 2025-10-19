@@ -34,10 +34,10 @@ namespace Launcher.Services
 
         public async Task<Result> Save(MessageEventArgs e)
         {
-            _logger.Log(LogLevel.Info, $"[WS] 画像更新中 ({e.Type})");
-
             if (e.Type == "ImgUpdateData")
             {
+                _logger.Log(LogLevel.Info, $"[WS] 画像更新中 ({e.Type})");
+
                 var data = JsonSerializer.Deserialize<ImgUpdateData>(e.Message);
 
                 var dataResult = await _metadataSaver.SaveToRepository(data.Id);
@@ -56,7 +56,6 @@ namespace Launcher.Services
                 return Result.Success();
             }
 
-            _logger.Log(LogLevel.Info, $"[WS] 画像更新失敗 ({e.Type})");
             return Result.Failure("画像更新失敗. GameImageSaver.Save()");
         }
 

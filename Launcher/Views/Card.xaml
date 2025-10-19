@@ -11,7 +11,7 @@
     <Grid>
         <Rectangle x:Name="BackGround" Fill="#FFF4F4F4" Height="471" Width="456" RadiusX="25" RadiusY="25"/>
         <Image x:Name="TitleImage" Source="{Binding Image.Value}" Height="222" Width="396" Margin="0,0,0,180" />
-        <TextBlock x:Name="Title" FontSize="36" Text="{Binding Title.Value}" Margin="40,290,42,154" />
+        <TextBlock x:Name="Title" FontSize="36" Text="{Binding Title.Value}" Margin="40,290,42,154" Width="398" TextTrimming="CharacterEllipsis" TextWrapping="NoWrap" TextAlignment="Left" />
         <Button x:Name="ClickButton" Command="{Binding DisplayDetailCommand}" Opacity="0" Height="496" Width="480" />
         <ItemsControl Height="83" Width="400" Margin="0,307,0,0" prism:RegionManager.RegionName="{Binding RegionName.Value}">
             <ItemsControl.ItemsPanel>

@@ -34,10 +34,9 @@ namespace Launcher.Services
 
         public async Task Save(MessageEventArgs e)
         {
-            _logger.Log(LogLevel.Info, $"[WS] 新規作成 ({e.Type})");
-
             if (e.Type == "CreateData")
             {
+                _logger.Log(LogLevel.Info, $"[WS] 新規作成中 ({e.Type})");
                 var data = JsonSerializer.Deserialize<CreateData>(e.Message);
 
                 var metadata = Utilities.DotsConverter.CreateDataToMetadata(data);
@@ -65,9 +64,9 @@ namespace Launcher.Services
                 }
 
                 _dataRepository.Registrar(metadata.Id, metadata);
-            }
 
-            _logger.Log(LogLevel.Error, $"[WS] 新規作成失敗 ({e.Type})");
+                _logger.Log(LogLevel.Info, $"[WS] 新規作成成功 ({e.Type})");
+            }
         }
 
         public async Task<Result> Save(GameMetadata data)
